@@ -1,0 +1,103 @@
+---
+import siteConfig from '../data/site-config';
+import ThemeToggle from './ThemeToggle.astro';
+
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<header class="w-full pt-8 pb-6 sm:pt-11 sm:pb-8 print:hidden">
+  <div class="mx-auto flex max-w-5xl items-center justify-between gap-6 px-6 sm:px-8">
+    <a
+      href="/"
+      class="font-serif text-xl font-medium tracking-[-0.015em] text-ink no-underline hover:text-sea transition-colors"
+    >
+      {siteConfig.name}
+    </a>
+
+    <div class="flex items-center gap-4 sm:gap-7">
+      <nav aria-label="Ana menü" class="hidden md:flex items-center gap-6">
+        {
+          siteConfig.headerNavLinks.map((link) => {
+            const active =
+              pathname === link.href ||
+              (link.href !== '/' && pathname.startsWith(link.href + '/'));
+            return (
+              <a
+                href={link.href}
+                aria-current={active ? 'page' : undefined}
+                class:list={[
+                  'font-sans text-[0.9375rem] no-underline transition-colors',
+                  active
+                    ? 'text-ink font-medium underline underline-offset-8 decoration-sea/70'
+                    : 'text-muted hover:text-ink'
+                ]}
+              >
+                {link.text}
+              </a>
+            );
+          })
+        }
+      </nav>
+
+      <ThemeToggle />
+
+      <button
+        id="mobile-menu-toggle"
+        type="button"
+        class="inline-flex h-8 items-center px-1 font-sans text-sm text-muted hover:text-ink md:hidden cursor-pointer"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        Menü
+      </button>
+    </div>
+  </div>
+
+  <nav
+    id="mobile-menu"
+    aria-label="Mobil menü"
+    class="hidden mx-auto max-w-5xl px-6 pt-5 pb-2 md:hidden"
+  >
+    <ul class="flex flex-col gap-3 rounded-sm bg-surface p-5">
+      {
+        siteConfig.headerNavLinks.map((link) => {
+          const active =
+            pathname === link.href ||
+            (link.href !== '/' && pathname.startsWith(link.href + '/'));
+          return (
+            <li>
+              <a
+                href={link.href}
+                aria-current={active ? 'page' : undefined}
+                class:list={[
+                  'block font-sans text-base no-underline',
+                  active ? 'text-sea font-medium' : 'text-ink'
+                ]}
+              >
+                {link.text}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </nav>
+</header>
+
+<script>
+  function bindMobileMenu() {
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    if (!toggle || !menu || toggle.dataset.bound === 'true') return;
+    toggle.dataset.bound = 'true';
+
+    toggle.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      toggle.textContent = expanded ? 'Menü' : 'Kapat';
+      menu.classList.toggle('hidden', expanded);
+    });
+  }
+
+  document.addEventListener('astro:page-load', bindMobileMenu);
+</script>

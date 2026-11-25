@@ -1,0 +1,138 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostRow from '../components/PostRow.astro';
+import QuestionBox from '../components/QuestionBox.astro';
+import siteConfig from '../data/site-config';
+import { sortByPublishDateDesc } from '../utils/format';
+
+const page = await getEntry('pages', 'rehberlik');
+const rendered = page ? await render(page) : null;
+const Content = rendered?.Content;
+
+const guidancePosts = sortByPublishDateDesc(
+  (await getCollection('yazilar')).filter((p) => p.data.category === 'Rehberlik')
+);
+
+const curatedBooks = (await getCollection('kitaplik'))
+  .filter((b) => b.data.audience === 'Öğrenci' || b.data.audience === 'Veli')
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title={page?.data.title ?? 'Rehberlik'}
+  description={page?.data.description ?? 'Öğrenciler ve veliler için rehberlik notları ve kaynaklar.'}
+  ogImage="/og/rehberlik.png"
+>
+  <div class="mx-auto max-w-5xl px-6 pt-6 sm:px-8 sm:pt-10">
+    <header class="max-w-[60ch] space-y-4 pb-10">
+      <h1 class="font-serif text-3xl font-medium tracking-[-0.02em] text-ink sm:text-4xl">
+        {page?.data.title ?? 'Rehberlik köşesi'}
+      </h1>
+      {
+        page?.data.subtitle && (
+          <p class="font-serif text-[1.1rem] leading-[1.75] text-muted">{page.data.subtitle}</p>
+        )
+      }
+    </header>
+
+    {
+      Content && (
+        <div class="editorial-prose pb-14">
+          <Content />
+        </div>
+      )
+    }
+
+    <!-- Yazdırılabilir Haftalık Ders Çalışma Tablosu Kutusu -->
+    <section
+      aria-labelledby="calisma-tablosu-tanitim"
+      class="mb-16 rounded-[2px] border border-rule bg-surface p-7 sm:p-8"
+    >
+      <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div class="max-w-[54ch] space-y-2">
+          <span class="font-sans text-xs font-medium text-botanical">
+            İndirilebilir ve yazdırılabilir araç
+          </span>
+          <h2
+            id="calisma-tablosu-tanitim"
+            class="font-serif text-2xl font-medium tracking-[-0.015em] text-ink"
+          >
+            Boş haftalık ders çalışma tablosu
+          </h2>
+          <p class="font-serif text-base leading-[1.7] text-muted">
+            Sade, göz yormayan A4 yatay formatında. İster boş PDF olarak indirip kalemle doldur,
+            ister tarayıcıda kendi programını yazıp yazdır.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 shrink-0">
+          <a href="/rehberlik/calisma-tablosu" class="primary-action">Tabloyu aç</a>
+          <a
+            href="/dosyalar/haftalik-ders-calisma-tablosu.pdf"
+            download="haftalik-ders-calisma-tablosu.pdf"
+            class="text-link"
+          >
+            Boş PDF indir
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="rehberlik-yazilari" class="pb-16">
+      <h2
+        id="rehberlik-yazilari"
+        class="mb-6 font-serif text-2xl font-medium tracking-[-0.015em] text-ink"
+      >
+        Rehberlik yazıları
+      </h2>
+
+      <div class="divide-y divide-rule">
+        {guidancePosts.map((post) => <PostRow post={post} showExcerpt={true} />)}
+      </div>
+    </section>
+
+    {
+      curatedBooks.length > 0 && (
+        <section aria-labelledby="secili-kaynaklar" class="pb-16">
+          <div class="mb-6 flex items-baseline justify-between gap-4">
+            <h2
+              id="secili-kaynaklar"
+              class="font-serif text-2xl font-medium tracking-[-0.015em] text-ink"
+            >
+              Öğrenci ve veliler için seçilmiş kitaplar
+            </h2>
+            <a href="/kitaplik" class="text-link">
+              Tüm kitaplık
+            </a>
+          </div>
+
+          <div class="grid gap-6 sm:grid-cols-2">
+            {curatedBooks.map((book) => (
+              <div class="rounded-[2px] bg-surface p-6 space-y-2">
+                <span class="font-sans text-xs font-medium text-botanical">
+                  {book.data.audience === 'Öğrenci' ? 'Öğrenciler için' : 'Veliler için'}
+                </span>
+                <h3 class="font-serif text-lg font-medium text-ink">{book.data.title}</h3>
+                <p class="font-sans text-xs text-muted">{book.data.creator}</p>
+                <p class="pt-1 font-serif text-[0.95rem] leading-[1.65] text-muted">
+                  {book.data.note}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <!-- Anonim Soru Kutusu -->
+    <div class="pb-14">
+      <QuestionBox />
+    </div>
+
+    <aside class="max-w-[64ch] rounded-[2px] bg-surface p-6 sm:p-7 border-l-2 border-botanical space-y-2">
+      <h2 class="font-serif text-lg font-medium text-ink">Etik sınır notu</h2>
+      <p class="font-sans text-sm leading-relaxed text-muted">{siteConfig.ethicsNote}</p>
+    </aside>
+  </div>
+</BaseLayout>

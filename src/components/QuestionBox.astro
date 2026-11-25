@@ -1,0 +1,161 @@
+---
+import siteConfig from '../data/site-config';
+
+const endpoint = siteConfig.questionBox.formEndpoint;
+const topics = [
+  'Sınav süreci ve kaygı',
+  'Ergenlik ve aile içi iletişim',
+  'Duygular ve sınırlar',
+  'Kitap veya kaynak önerisi',
+  'Diğer'
+];
+---
+
+<section
+  aria-labelledby="anonim-soru-baslik"
+  class="rounded-[2px] bg-surface p-7 sm:p-9 space-y-6"
+>
+  <div class="max-w-[58ch] space-y-2">
+    <h2
+      id="anonim-soru-baslik"
+      class="font-serif text-2xl font-medium tracking-[-0.015em] text-ink"
+    >
+      Merak ettiklerin (anonim soru kutusu)
+    </h2>
+    <p class="font-serif text-base leading-[1.72] text-muted">
+      İsmini ya da iletişim bilgisini paylaşmadan aklına takılan genel bir soruyu bırakabilirsin.
+      Gelen sorulara tek tek özel mesajla değil, yeni rehberlik yazılarıyla yanıt veriyorum.
+    </p>
+  </div>
+
+  <form
+    id="anonymous-question-form"
+    data-endpoint={endpoint}
+    class="max-w-[58ch] space-y-5"
+    novalidate
+  >
+    <!-- Spam önleme için gizli alan -->
+    <input
+      type="text"
+      name="_gotcha"
+      tabindex="-1"
+      autocomplete="off"
+      class="hidden"
+      aria-hidden="true"
+    />
+
+    <div class="space-y-2">
+      <label for="question-topic" class="block font-sans text-sm font-medium text-ink">
+        Konu başlığı
+      </label>
+      <select
+        id="question-topic"
+        name="konu"
+        class="w-full rounded-[3px] border border-rule bg-canvas px-3.5 py-2.5 font-sans text-sm text-ink focus:border-sea"
+      >
+        {topics.map((topic) => <option value={topic}>{topic}</option>)}
+      </select>
+    </div>
+
+    <div class="space-y-2">
+      <div class="flex items-baseline justify-between gap-4">
+        <label for="question-body" class="block font-sans text-sm font-medium text-ink">
+          Sorun
+        </label>
+        <span id="question-char-count" class="font-sans text-xs text-muted">0 / 1000</span>
+      </div>
+      <textarea
+        id="question-body"
+        name="soru"
+        rows="4"
+        maxlength="1000"
+        required
+        placeholder="İsim veya okul bilgisi vermeden, genel olarak neyi merak ettiğini yazabilirsin."
+        class="w-full resize-y rounded-[3px] border border-rule bg-canvas px-3.5 py-3 font-serif text-base leading-relaxed text-ink placeholder:text-muted/70 focus:border-sea"
+      ></textarea>
+    </div>
+
+    <p class="font-sans text-xs leading-relaxed text-muted">
+      Bu alan acil destek hattı değildir. Acil bir durum yaşıyorsan okul rehberlik servisine ya da
+      112 / 183 hatlarına doğrudan ulaşabilirsin.
+    </p>
+
+    <div class="flex flex-wrap items-center gap-4 pt-1">
+      <button type="submit" id="question-submit-btn" class="primary-action cursor-pointer">
+        Soruyu gönder
+      </button>
+      <p
+        id="question-status"
+        role="status"
+        aria-live="polite"
+        class="font-sans text-sm text-muted"
+      ></p>
+    </div>
+  </form>
+</section>
+
+<script>
+  function bindQuestionForm() {
+    const form = document.getElementById('anonymous-question-form') as HTMLFormElement | null;
+    const textarea = document.getElementById('question-body') as HTMLTextAreaElement | null;
+    const counter = document.getElementById('question-char-count');
+    const status = document.getElementById('question-status');
+    const submitBtn = document.getElementById('question-submit-btn') as HTMLButtonElement | null;
+    if (!form || !textarea || !status || !submitBtn || form.dataset.bound === 'true') return;
+    form.dataset.bound = 'true';
+
+    const updateCount = () => {
+      if (counter) counter.textContent = `${textarea.value.length} / 1000`;
+    };
+    textarea.addEventListener('input', updateCount);
+    updateCount();
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const message = textarea.value.trim();
+
+      if (message.length < 12) {
+        status.textContent = 'Göndermeden önce en az bir kısa cümle (12 karakter) yaz.';
+        textarea.focus();
+        return;
+      }
+
+      const endpoint = form.dataset.endpoint?.trim() ?? '';
+      if (!endpoint) {
+        status.textContent =
+          'Önizleme modu: Form hazır. Canlıya alırken site-config.ts içindeki formEndpoint alanına Formspree veya Web3Forms adresini eklemen yeterli.';
+        form.reset();
+        updateCount();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Gönderiliyor...';
+      status.textContent = '';
+
+      try {
+        const data = new FormData(form);
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          body: data,
+          headers: { Accept: 'application/json' }
+        });
+
+        if (response.ok) {
+          form.reset();
+          updateCount();
+          status.textContent = 'Sorun ulaştı. Yeni rehberlik yazıları için not aldım.';
+        } else {
+          status.textContent = 'Gönderim tamamlanamadı. Biraz sonra tekrar dene.';
+        }
+      } catch {
+        status.textContent = 'Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar dene.';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Soruyu gönder';
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', bindQuestionForm);
+</script>

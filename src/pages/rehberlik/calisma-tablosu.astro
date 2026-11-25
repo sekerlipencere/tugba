@@ -1,0 +1,252 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BotanicalMark from '../../components/BotanicalMark.astro';
+
+const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+const rows = [
+  '1. Oturum',
+  '2. Oturum',
+  '3. Oturum',
+  '4. Oturum',
+  '5. Oturum',
+  '6. Oturum',
+  'Tekrar ve okuma',
+  'Dinlenme ve mola'
+];
+---
+
+<BaseLayout
+  title="Haftalık ders çalışma tablosu"
+  description="İster boş olarak indirip yazdırabileceğin, ister ekranda doldurup A4 çıktı alabileceğin sade haftalık ders çalışma tablosu."
+  ogImage="/og/calisma-tablosu.png"
+>
+  <div class="mx-auto max-w-6xl px-6 pt-6 sm:px-8 sm:pt-10 print:max-w-none print:p-0">
+    <!-- Ekran başlığı ve işlem çubuğu (yazdırmada gizlenir) -->
+    <div class="space-y-6 pb-8 print:hidden">
+      <a
+        href="/rehberlik"
+        class="font-sans text-sm text-muted no-underline hover:text-sea transition-colors"
+      >
+        Rehberlik köşesine dön
+      </a>
+
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-[58ch] space-y-3">
+          <h1 class="font-serif text-3xl font-medium tracking-[-0.02em] text-ink sm:text-4xl">
+            Haftalık ders çalışma tablosu
+          </h1>
+          <p class="font-serif text-base leading-[1.72] text-muted">
+            Boş olarak indirip kalemle doldurabilir ya da aşağıdaki kutucuklara doğrudan yazıp A4
+            yatay çıktı alabilirsin. Dolu saatler kadar mola ve dinlenme alanını da plana eklemeyi
+            unutma.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <a
+            href="/dosyalar/haftalik-ders-calisma-tablosu.pdf"
+            download="haftalik-ders-calisma-tablosu.pdf"
+            class="primary-action"
+          >
+            Boş PDF indir
+          </a>
+          <button
+            id="print-schedule-btn"
+            type="button"
+            class="rounded-[3px] border border-rule bg-surface px-4 py-2.5 font-sans text-sm font-medium text-ink transition-colors hover:border-sea cursor-pointer"
+          >
+            Yazdır veya PDF kaydet
+          </button>
+          <button
+            id="clear-schedule-btn"
+            type="button"
+            class="px-2.5 py-2 font-sans text-sm text-muted hover:text-ink cursor-pointer"
+          >
+            Tabloyu temizle
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Yazdırılabilir A4 Yatay Çalışma Kağıdı -->
+    <section
+      aria-label="Haftalık ders çalışma tablosu"
+      class="rounded-[2px] border border-rule bg-canvas p-5 sm:p-8 print:border-0 print:p-0"
+    >
+      <div class="mb-5 flex flex-wrap items-end justify-between gap-4 border-b border-rule pb-4">
+        <div class="flex items-center gap-3">
+          <BotanicalMark class="h-7 w-7 text-botanical shrink-0" />
+          <div>
+            <h2 class="font-serif text-xl font-medium text-ink">Haftalık ders çalışma planı</h2>
+            <p class="font-sans text-xs text-muted">Tuğba — Rehberlik köşesi</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-6 font-sans text-xs text-muted">
+          <label class="flex items-baseline gap-2">
+            <span>Hafta:</span>
+            <input
+              type="text"
+              data-schedule-field="hafta"
+              placeholder=".... / .... / 2026"
+              class="w-36 border-b border-rule bg-transparent pb-0.5 text-ink focus:border-sea focus:outline-none print:placeholder:text-transparent"
+            />
+          </label>
+          <label class="flex items-baseline gap-2">
+            <span>Haftalık odak:</span>
+            <input
+              type="text"
+              data-schedule-field="odak"
+              placeholder="Örn. paragraf + düzenli tekrar"
+              class="w-52 border-b border-rule bg-transparent pb-0.5 text-ink focus:border-sea focus:outline-none print:placeholder:text-transparent"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[780px] border-collapse font-sans text-xs print:min-w-0">
+          <thead>
+            <tr>
+              <th
+                scope="col"
+                class="w-36 border border-rule bg-surface px-2.5 py-2.5 text-left font-medium text-ink"
+              >
+                Saat / Oturum
+              </th>
+              {
+                days.map((day) => (
+                  <th
+                    scope="col"
+                    class="border border-rule bg-surface px-2.5 py-2.5 text-left font-medium text-ink"
+                  >
+                    {day}
+                  </th>
+                ))
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((rowLabel, rowIndex) => (
+                <tr>
+                  <th
+                    scope="row"
+                    class="border border-rule bg-surface/55 px-2.5 py-2 text-left font-normal text-muted align-top"
+                  >
+                    <input
+                      type="text"
+                      value={rowLabel}
+                      data-schedule-field={`saat-${rowIndex}`}
+                      aria-label={`${rowLabel} saat etiketi`}
+                      class="w-full bg-transparent text-xs font-medium text-ink focus:outline-none"
+                    />
+                  </th>
+                  {days.map((day, colIndex) => (
+                    <td class="border border-rule p-1.5 align-top">
+                      <textarea
+                        rows="2"
+                        data-schedule-field={`hucre-${rowIndex}-${colIndex}`}
+                        aria-label={`${day} ${rowLabel}`}
+                        class="w-full resize-none bg-transparent font-sans text-xs leading-snug text-ink focus:outline-none print:min-h-[38px]"
+                      />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-5 grid gap-4 pt-2 sm:grid-cols-2">
+        <label class="block space-y-1.5 font-sans text-xs text-muted">
+          <span class="font-medium text-ink">Bu haftanın üç küçük hedefi</span>
+          <textarea
+            rows="2"
+            data-schedule-field="hedefler"
+            placeholder="1) ...   2) ...   3) ..."
+            class="w-full resize-none rounded-[2px] border border-rule bg-surface/40 p-2.5 text-xs text-ink focus:border-sea focus:outline-none print:placeholder:text-transparent"
+          ></textarea>
+        </label>
+
+        <label class="block space-y-1.5 font-sans text-xs text-muted">
+          <span class="font-medium text-ink">Hafta sonu değerlendirmesi (Ne iyi gitti?)</span>
+          <textarea
+            rows="2"
+            data-schedule-field="degerlendirme"
+            placeholder="Kendine kısa bir not bırak..."
+            class="w-full resize-none rounded-[2px] border border-rule bg-surface/40 p-2.5 text-xs text-ink focus:border-sea focus:outline-none print:placeholder:text-transparent"
+          ></textarea>
+        </label>
+      </div>
+    </section>
+
+    <p class="mt-4 font-sans text-xs text-muted print:hidden">
+      Yazdığın plan yalnızca senin tarayıcında saklanır, sunucuya gönderilmez.
+    </p>
+  </div>
+</BaseLayout>
+
+<script>
+  const STORAGE_KEY = 'tugba-calisma-tablosu-v1';
+
+  function bindSchedulePage() {
+    const printBtn = document.getElementById('print-schedule-btn');
+    const clearBtn = document.getElementById('clear-schedule-btn');
+    const fields = document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+      '[data-schedule-field]'
+    );
+    if (!fields.length) return;
+
+    // Kaydedilmiş notları yükle
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') as Record<string, string>;
+      fields.forEach((field) => {
+        const key = field.dataset.scheduleField;
+        if (key && typeof saved[key] === 'string') {
+          field.value = saved[key];
+        }
+      });
+    } catch {
+      // depolama kapalıysa sessizce devam et
+    }
+
+    const persist = () => {
+      try {
+        const data: Record<string, string> = {};
+        fields.forEach((field) => {
+          const key = field.dataset.scheduleField;
+          if (key) data[key] = field.value;
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch {}
+    };
+
+    fields.forEach((field) => {
+      if (field.dataset.bound === 'true') return;
+      field.dataset.bound = 'true';
+      field.addEventListener('input', persist);
+    });
+
+    if (printBtn && printBtn.dataset.bound !== 'true') {
+      printBtn.dataset.bound = 'true';
+      printBtn.addEventListener('click', () => window.print());
+    }
+
+    if (clearBtn && clearBtn.dataset.bound !== 'true') {
+      clearBtn.dataset.bound = 'true';
+      clearBtn.addEventListener('click', () => {
+        fields.forEach((field) => {
+          if (field.dataset.scheduleField?.startsWith('saat-')) return;
+          field.value = '';
+        });
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch {}
+      });
+    }
+  }
+
+  document.addEventListener('astro:page-load', bindSchedulePage);
+</script>

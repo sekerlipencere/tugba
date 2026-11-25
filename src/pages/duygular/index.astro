@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatTurkishDate, sortByPublishDateDesc } from '../../utils/format';
+
+const entries = sortByPublishDateDesc(await getCollection('duygular'));
+---
+
+<BaseLayout
+  title="Duygular sözlüğü"
+  description="Hissettiğimiz ama çoğu zaman tek kelimeyle anlatamadığımız duygular, anlık kareler ve kısa notlar."
+  ogImage="/og/duygular.png"
+>
+  <div class="mx-auto max-w-5xl px-6 pt-6 sm:px-8 sm:pt-10">
+    <header class="max-w-[58ch] space-y-4 pb-14">
+      <h1 class="font-serif text-3xl font-medium tracking-[-0.02em] text-ink sm:text-4xl">
+        Duygular sözlüğü
+      </h1>
+      <p class="font-serif text-[1.08rem] leading-[1.75] text-muted">
+        Hissettiğimiz ama anlatmakta zorlandığımız hâller için küçük defter kayıtları. Kimi bir
+        vapur köpüğünde, kimi bir kitap sayfasının kenarında kaldı.
+      </p>
+    </header>
+
+    <div class="grid gap-x-14 gap-y-16 md:grid-cols-2">
+      {
+        entries.map((entry, idx) => (
+          <article class:list={['space-y-4', idx % 2 === 1 && 'md:mt-14']}>
+            <a href={`/duygular/${entry.id}`} class="group block space-y-4 no-underline">
+              <p class="font-serif text-lg italic text-ink/90">“{entry.data.handwrittenLine}”</p>
+
+              {entry.data.photo && (
+                <div class="overflow-hidden rounded-[2px] bg-surface">
+                  <img
+                    src={entry.data.photo}
+                    alt={entry.data.photoAlt ?? entry.data.term}
+                    width="1200"
+                    height="900"
+                    class="aspect-[4/3] w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              )}
+
+              <div class="space-y-2 pt-1">
+                <h2 class="font-serif text-[1.35rem] font-medium leading-snug text-ink transition-colors group-hover:text-sea">
+                  {entry.data.term}
+                </h2>
+                <p class="font-serif text-[0.98rem] leading-[1.7] text-muted">
+                  {entry.data.excerpt}
+                </p>
+                <div class="flex flex-wrap gap-x-4 pt-1 font-sans text-xs text-muted">
+                  {entry.data.location && <span>{entry.data.location}</span>}
+                  <time datetime={entry.data.publishDate.toISOString()}>
+                    {formatTurkishDate(entry.data.publishDate)}
+                  </time>
+                </div>
+              </div>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

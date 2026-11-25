@@ -1,0 +1,216 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostRow from '../components/PostRow.astro';
+import siteConfig from '../data/site-config';
+import { POST_CATEGORIES } from '../content.config';
+import { sortByPublishDateDesc } from '../utils/format';
+
+const allPosts = sortByPublishDateDesc(await getCollection('yazilar'));
+const recentPosts = allPosts.slice(0, 5);
+
+const allEmotions = sortByPublishDateDesc(await getCollection('duygular'));
+const featuredEmotion = allEmotions[0];
+---
+
+<BaseLayout
+  title={siteConfig.title}
+  description={siteConfig.description}
+  ogImage="/og/anasayfa.png"
+>
+  <div class="mx-auto max-w-5xl px-6 sm:px-8">
+    <!-- Defter Açılışı: Sitenin tek özgün görsel imzası -->
+    <section class="pt-6 pb-20 sm:pt-10 sm:pb-28">
+      <div class="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-14">
+        <div class="hero-reveal space-y-6">
+          <h1 class="font-serif text-4xl font-medium leading-[1.14] tracking-[-0.025em] text-ink sm:text-5xl">
+            {siteConfig.hero.headline}
+          </h1>
+
+          <p class="max-w-[46ch] font-serif text-[1.125rem] leading-[1.78] text-muted">
+            {siteConfig.hero.intro}
+          </p>
+
+          <div class="flex flex-wrap items-center gap-6 pt-2">
+            <a href={siteConfig.hero.primaryAction.href} class="primary-action">
+              {siteConfig.hero.primaryAction.text}
+            </a>
+            <a href={siteConfig.hero.secondaryAction.href} class="text-link">
+              {siteConfig.hero.secondaryAction.text}
+            </a>
+          </div>
+        </div>
+
+        <figure class="hero-reveal-photo">
+          <div class="overflow-hidden rounded-[2px] bg-surface">
+            <img
+              src={siteConfig.hero.imageSrc}
+              alt={siteConfig.hero.imageAlt}
+              width="1203"
+              height="904"
+              class="aspect-[5/4] w-full object-cover"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+          <figcaption class="mt-3 font-sans text-xs text-muted">
+            {siteConfig.hero.imageCaption}
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- Son yazılar -->
+    <section aria-labelledby="son-yazilar-baslik" class="pb-20 sm:pb-24">
+      <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between">
+        <h2
+          id="son-yazilar-baslik"
+          class="font-serif text-2xl font-medium tracking-[-0.015em] text-ink"
+        >
+          Son yazılar
+        </h2>
+
+        <div class="flex flex-wrap gap-1" role="group" aria-label="Yazıları konuya göre süz">
+          <button type="button" class="filter-tab" data-home-filter="Tümü" aria-pressed="true">
+            Tümü
+          </button>
+          {
+            POST_CATEGORIES.map((category) => (
+              <button
+                type="button"
+                class="filter-tab"
+                data-home-filter={category}
+                aria-pressed="false"
+              >
+                {category}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div id="home-post-list" class="divide-y divide-rule">
+        {recentPosts.map((post) => <PostRow post={post} showExcerpt={false} />)}
+      </div>
+
+      <p id="home-empty-state" class="hidden py-6 font-sans text-sm text-muted">
+        Bu rafta henüz yeni yazı yok. Tüm yazılara göz atabilirsin.
+      </p>
+
+      <div class="mt-8">
+        <a href="/yazilar" class="text-link">Tüm yazıları gör</a>
+      </div>
+    </section>
+
+    <!-- Duygular sözlüğünden diptik + Şu an masamda -->
+    <section class="grid gap-12 lg:grid-cols-[1.25fr_0.75fr] lg:items-start lg:gap-14">
+      {
+        featuredEmotion && (
+          <div class="space-y-6">
+            <div class="flex items-baseline justify-between gap-4">
+              <h2 class="font-serif text-2xl font-medium tracking-[-0.015em] text-ink">
+                Duygular sözlüğünden
+              </h2>
+              <a href="/duygular" class="text-link">
+                Tüm sözlüğü aç
+              </a>
+            </div>
+
+            <article class="space-y-5">
+              <a href={`/duygular/${featuredEmotion.id}`} class="group block space-y-5 no-underline">
+                <p class="font-serif text-xl italic text-ink/90">
+                  “{featuredEmotion.data.handwrittenLine}”
+                </p>
+
+                {featuredEmotion.data.photo && (
+                  <div class="overflow-hidden rounded-[2px] bg-surface">
+                    <img
+                      src={featuredEmotion.data.photo}
+                      alt={featuredEmotion.data.photoAlt ?? featuredEmotion.data.term}
+                      width="1200"
+                      height="900"
+                      class="aspect-[4/3] w-full object-cover"
+                      loading="eager"
+                      decoding="async"
+                    />
+                  </div>
+                )}
+
+                <div class="space-y-2">
+                  <h3 class="font-serif text-xl font-medium text-ink transition-colors group-hover:text-sea">
+                    {featuredEmotion.data.term}
+                  </h3>
+                  <p class="max-w-[56ch] font-serif text-base leading-[1.72] text-muted">
+                    {featuredEmotion.data.excerpt}
+                  </p>
+                </div>
+              </a>
+            </article>
+          </div>
+        )
+      }
+
+      <aside aria-labelledby="masamda-baslik" class="rounded-[2px] bg-surface p-7 sm:p-8">
+        <h2
+          id="masamda-baslik"
+          class="font-serif text-xl font-medium tracking-[-0.01em] text-ink"
+        >
+          Şu an masamda
+        </h2>
+
+        <dl class="mt-6 space-y-5">
+          {
+            siteConfig.deskNow.map((item) => (
+              <div>
+                <dt class="font-sans text-xs font-medium text-muted">{item.label}</dt>
+                <dd class="mt-1 font-serif text-base leading-snug text-ink">
+                  {item.value}
+                  {item.detail && (
+                    <span class="block font-sans text-xs text-muted mt-0.5">{item.detail}</span>
+                  )}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <div class="mt-7 flex flex-wrap gap-x-5 gap-y-2 pt-5 border-t border-rule">
+          <a href="/kitaplik" class="text-link">Kitaplığa git</a>
+          <a href="/aklimda-kalanlar" class="text-link">Aklımda kalanlar</a>
+        </div>
+      </aside>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  function bindHomeFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-home-filter]');
+    const list = document.getElementById('home-post-list');
+    const empty = document.getElementById('home-empty-state');
+    if (!buttons.length || !list) return;
+
+    buttons.forEach((button) => {
+      if (button.dataset.bound === 'true') return;
+      button.dataset.bound = 'true';
+
+      button.addEventListener('click', () => {
+        const selected = button.dataset.homeFilter ?? 'Tümü';
+        buttons.forEach((btn) => btn.setAttribute('aria-pressed', String(btn === button)));
+
+        let visibleCount = 0;
+        list.querySelectorAll<HTMLElement>('article[data-category]').forEach((article) => {
+          const match = selected === 'Tümü' || article.dataset.category === selected;
+          article.classList.toggle('hidden', !match);
+          if (match) visibleCount += 1;
+        });
+
+        if (empty) {
+          empty.classList.toggle('hidden', visibleCount > 0);
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', bindHomeFilter);
+</script>

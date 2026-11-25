@@ -1,0 +1,137 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BotanicalMark from '../../components/BotanicalMark.astro';
+import { estimateReadingMinutes, formatTurkishDate, sortByPublishDateDesc } from '../../utils/format';
+
+export async function getStaticPaths() {
+  const posts = sortByPublishDateDesc(await getCollection('yazilar'));
+  return posts.map((post, index) => ({
+    params: { id: post.id },
+    props: {
+      post,
+      newerPost: index > 0 ? posts[index - 1] : null,
+      olderPost: index < posts.length - 1 ? posts[index + 1] : null
+    }
+  }));
+}
+
+const { post, newerPost, olderPost } = Astro.props;
+const { Content } = await render(post);
+const { title, excerpt, publishDate, category, tags, coverImage, coverAlt, coverCaption } = post.data;
+const readingMinutes = estimateReadingMinutes(post.body);
+const isGuidance = category === 'Rehberlik';
+---
+
+<BaseLayout
+  title={title}
+  description={excerpt}
+  ogImage={`/og/yazilar/${post.id}.png`}
+  ogType="article"
+  showReadingProgress={true}
+>
+  <article class="mx-auto max-w-5xl px-6 pt-6 sm:px-8 sm:pt-10">
+    <div class="max-w-[64ch]">
+      <div class="mb-6 flex flex-wrap items-center gap-x-4 gap-y-1 font-sans text-sm">
+        <a href="/yazilar" class="text-muted no-underline hover:text-sea transition-colors">
+          Yazılar
+        </a>
+        <span class="text-muted/50" aria-hidden="true">/</span>
+        <span class:list={[isGuidance ? 'text-botanical font-medium' : 'text-muted']}>
+          {category}
+        </span>
+      </div>
+
+      <h1 class="font-serif text-3xl font-medium leading-[1.2] tracking-[-0.02em] text-ink sm:text-[2.45rem]">
+        {title}
+      </h1>
+
+      <div class="mt-5 flex flex-wrap gap-x-5 gap-y-1 font-sans text-sm text-muted">
+        <time datetime={publishDate.toISOString()}>{formatTurkishDate(publishDate)}</time>
+        <span>{readingMinutes} dakika okuma</span>
+      </div>
+    </div>
+
+    {
+      coverImage && (
+        <figure class="mt-10 max-w-3xl">
+          <div class="overflow-hidden rounded-[2px] bg-surface">
+            <img
+              src={coverImage}
+              alt={coverAlt ?? title}
+              class="aspect-[16/10] w-full object-cover"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+          {coverCaption && (
+            <figcaption class="mt-3 font-sans text-xs text-muted">{coverCaption}</figcaption>
+          )}
+        </figure>
+      )
+    }
+
+    <div class="editorial-prose mt-10">
+      <Content />
+    </div>
+
+    {
+      isGuidance && (
+        <aside class="mt-12 max-w-[64ch] rounded-[2px] bg-surface p-6 border-l-2 border-botanical">
+          <p class="font-sans text-sm leading-relaxed text-muted">
+            Bu yazı genel bilgilendirme amaçlı hazırlanmıştır. Zorlayıcı bir süreçten geçiyorsan
+            okul rehberlik servisine ya da bir uzmana doğrudan başvurabilirsin.
+          </p>
+        </aside>
+      )
+    }
+
+    <div class="mt-14 flex max-w-[64ch] flex-col items-start gap-8">
+      <div class="text-botanical/80">
+        <BotanicalMark class="h-8 w-8" />
+      </div>
+
+      {
+        tags.length > 0 && (
+          <div class="flex flex-wrap gap-2" aria-label="Konu başlıkları">
+            {tags.map((tag) => (
+              <span class="rounded-[2px] bg-surface px-2.5 py-1 font-sans text-xs text-muted">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )
+      }
+
+      <nav
+        aria-label="Diğer yazılar"
+        class="grid w-full gap-6 border-t border-rule pt-8 sm:grid-cols-2"
+      >
+        <div>
+          {
+            olderPost && (
+              <a href={`/yazilar/${olderPost.id}`} class="group block no-underline">
+                <span class="block font-sans text-xs text-muted">Önceki yazı</span>
+                <span class="mt-1 block font-serif text-base text-ink group-hover:text-sea transition-colors">
+                  {olderPost.data.title}
+                </span>
+              </a>
+            )
+          }
+        </div>
+        <div class="sm:text-right">
+          {
+            newerPost && (
+              <a href={`/yazilar/${newerPost.id}`} class="group block no-underline">
+                <span class="block font-sans text-xs text-muted">Sonraki yazı</span>
+                <span class="mt-1 block font-serif text-base text-ink group-hover:text-sea transition-colors">
+                  {newerPost.data.title}
+                </span>
+              </a>
+            )
+          }
+        </div>
+      </nav>
+    </div>
+  </article>
+</BaseLayout>

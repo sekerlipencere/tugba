@@ -1,0 +1,236 @@
+# Pages CMS (https://pagescms.org) yapılandırması
+# Bu dosya sayesinde GitHub deposu app.pagescms.org üzerinden
+# teknik bilgi gerekmeden kolayca yönetilebilir.
+
+media:
+  - name: images
+    label: Fotoğraflar
+    input: public/images
+    output: /images
+    extensions: [jpg, jpeg, png, webp, avif]
+  - name: dosyalar
+    label: PDF dosyaları
+    input: public/dosyalar
+    output: /dosyalar
+    extensions: [pdf]
+
+content:
+  - name: yazilar
+    label: Yazılar
+    type: collection
+    path: src/content/yazilar
+    format: yaml-frontmatter
+    filename: "{fields.title}.md"
+    view:
+      fields: [title, category, publishDate]
+      primary: title
+      sort: [publishDate, title]
+      search: [title, excerpt, body]
+      default:
+        sort: publishDate
+        order: desc
+    fields:
+      - name: title
+        label: Başlık
+        type: string
+        required: true
+      - name: excerpt
+        label: Kısa özet
+        type: text
+        required: true
+        description: Yazı listesinde ve paylaşım kartlarında görünen 1-2 cümlelik özet.
+      - name: publishDate
+        label: Yayın tarihi
+        type: date
+        required: true
+      - name: category
+        label: Kategori
+        type: select
+        required: true
+        options:
+          values:
+            - Rehberlik
+            - Denemeler
+            - Kitap ve sinema
+      - name: featured
+        label: Öne çıkan yazı
+        type: boolean
+        default: false
+      - name: tags
+        label: Konu başlıkları
+        type: string
+        list: true
+      - name: coverImage
+        label: Kapak fotoğrafı (isteğe bağlı)
+        type: image
+        options:
+          media: images
+      - name: coverAlt
+        label: Kapak fotoğrafı açıklaması
+        type: string
+        description: Görme engelli okuyucular için kısa görsel tarifi.
+      - name: coverCaption
+        label: Kapak altı notu
+        type: string
+      - name: body
+        label: Yazı metni
+        type: rich-text
+        options:
+          media: images
+
+  - name: duygular
+    label: Duygular sözlüğü
+    type: collection
+    path: src/content/duygular
+    format: yaml-frontmatter
+    filename: "{fields.term}.md"
+    view:
+      fields: [term, location, publishDate]
+      primary: term
+      sort: [publishDate, term]
+      search: [term, handwrittenLine, excerpt]
+      default:
+        sort: publishDate
+        order: desc
+    fields:
+      - name: term
+        label: Duygu veya kavram adı
+        type: string
+        required: true
+      - name: handwrittenLine
+        label: Kısa defter cümlesi
+        type: string
+        required: true
+        description: Fotoğrafın hemen üstünde italik görünen kısa cümle.
+      - name: excerpt
+        label: Kısa açıklama
+        type: text
+        required: true
+      - name: publishDate
+        label: Tarih
+        type: date
+        required: true
+      - name: location
+        label: Yer veya not (isteğe bağlı)
+        type: string
+      - name: photo
+        label: Fotoğraf (isteğe bağlı)
+        type: image
+        options:
+          media: images
+      - name: photoAlt
+        label: Fotoğraf açıklaması
+        type: string
+      - name: body
+        label: Detay metni
+        type: rich-text
+        options:
+          media: images
+
+  - name: kitaplik
+    label: Kitaplık
+    type: collection
+    path: src/content/kitaplik
+    format: yaml-frontmatter
+    filename: "{fields.title}.md"
+    view:
+      fields: [title, creator, kind, audience, status]
+      primary: title
+      sort: [order, title]
+      search: [title, creator, note]
+      default:
+        sort: order
+        order: asc
+    fields:
+      - name: title
+        label: Kitap veya film adı
+        type: string
+        required: true
+      - name: creator
+        label: Yazar veya yönetmen
+        type: string
+        required: true
+      - name: kind
+        label: Tür
+        type: select
+        required: true
+        options:
+          values:
+            - Kitap
+            - Film
+      - name: audience
+        label: Kimin için
+        type: select
+        required: true
+        options:
+          values:
+            - Genel
+            - Öğrenci
+            - Veli
+      - name: status
+        label: Durum
+        type: select
+        required: true
+        options:
+          values:
+            - Okundu
+            - Şu an okunuyor
+            - İzlendi
+      - name: quote
+        label: Altı çizili alıntı (isteğe bağlı)
+        type: text
+      - name: note
+        label: Kısa okuma notun
+        type: text
+        required: true
+      - name: order
+        label: Sıralama numarası
+        type: number
+        default: 100
+        description: Küçük sayı daha üstte görünür.
+
+  - name: hakkimda
+    label: Hakkımda sayfası
+    type: file
+    path: src/content/pages/hakkimda.md
+    format: yaml-frontmatter
+    fields:
+      - name: title
+        label: Sayfa başlığı
+        type: string
+        required: true
+      - name: subtitle
+        label: Alt başlık
+        type: string
+      - name: description
+        label: Arama motoru açıklaması
+        type: text
+        required: true
+      - name: body
+        label: Sayfa içeriği
+        type: rich-text
+        options:
+          media: images
+
+  - name: rehberlik
+    label: Rehberlik sayfası girişi
+    type: file
+    path: src/content/pages/rehberlik.md
+    format: yaml-frontmatter
+    fields:
+      - name: title
+        label: Sayfa başlığı
+        type: string
+        required: true
+      - name: subtitle
+        label: Alt başlık
+        type: string
+      - name: description
+        label: Arama motoru açıklaması
+        type: text
+        required: true
+      - name: body
+        label: Giriş metni
+        type: rich-text
+        options:
+          media: images

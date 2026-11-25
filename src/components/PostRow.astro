@@ -1,0 +1,43 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatTurkishDate, estimateReadingMinutes } from '../utils/format';
+
+interface Props {
+  post: CollectionEntry<'yazilar'>;
+  showExcerpt?: boolean;
+}
+
+const { post, showExcerpt = false } = Astro.props;
+const { title, excerpt, publishDate, category } = post.data;
+const readingMinutes = estimateReadingMinutes(post.body);
+const isGuidance = category === 'Rehberlik';
+---
+
+<article class="group py-6 first:pt-0" data-category={category}>
+  <a href={`/yazilar/${post.id}`} class="block no-underline">
+    <div class="grid gap-2 md:grid-cols-[1fr_11.5rem] md:items-baseline md:gap-8">
+      <div>
+        <h3 class="font-serif text-[1.25rem] font-medium leading-[1.35] text-ink transition-colors group-hover:text-sea">
+          {title}
+        </h3>
+        {
+          showExcerpt && (
+            <p class="mt-2 max-w-[60ch] font-serif text-[0.98rem] leading-[1.68] text-muted">
+              {excerpt}
+            </p>
+          )
+        }
+      </div>
+
+      <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 font-sans text-sm md:flex-col md:items-end md:gap-0.5">
+        <span class:list={[isGuidance ? 'text-botanical font-medium' : 'text-muted']}>
+          {category}
+        </span>
+        <time datetime={publishDate.toISOString()} class="text-muted">
+          {formatTurkishDate(publishDate)}
+        </time>
+        <span class="text-xs text-muted/85">{readingMinutes} dk okuma</span>
+      </div>
+    </div>
+  </a>
+</article>

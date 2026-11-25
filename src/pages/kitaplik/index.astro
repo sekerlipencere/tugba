@@ -1,0 +1,119 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const items = (await getCollection('kitaplik')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Kitaplık"
+  description="Altını çizdiğim kitaplar, iz bırakan filmler ve öğrenciler ile veliler için seçilmiş öneriler."
+  ogImage="/og/kitaplik.png"
+>
+  <div class="mx-auto max-w-5xl px-6 pt-6 sm:px-8 sm:pt-10">
+    <header class="max-w-[58ch] space-y-4 pb-10">
+      <h1 class="font-serif text-3xl font-medium tracking-[-0.02em] text-ink sm:text-4xl">
+        Kitaplık
+      </h1>
+      <p class="font-serif text-[1.08rem] leading-[1.75] text-muted">
+        Üzerinde kurşun kalem izi kalmış kitaplar, defalarca dönüp baktığım filmler ve öğrenci ya da
+        velilerle paylaşmayı sevdiğim eserler.
+      </p>
+    </header>
+
+    <div class="mb-10 flex flex-wrap gap-1.5" role="group" aria-label="Kitaplık süzgeci">
+      <button type="button" class="filter-tab" data-shelf-filter="Tümü" aria-pressed="true">
+        Tümü ({items.length})
+      </button>
+      <button type="button" class="filter-tab" data-shelf-filter="Kitap" aria-pressed="false">
+        Kitap
+      </button>
+      <button type="button" class="filter-tab" data-shelf-filter="Film" aria-pressed="false">
+        Film
+      </button>
+      <button type="button" class="filter-tab" data-shelf-filter="Öğrenci" aria-pressed="false">
+        Öğrenciler için
+      </button>
+      <button type="button" class="filter-tab" data-shelf-filter="Veli" aria-pressed="false">
+        Veliler için
+      </button>
+    </div>
+
+    <div id="shelf-list" class="divide-y divide-rule">
+      {
+        items.map((item) => (
+          <article
+            class="py-8 first:pt-0"
+            data-kind={item.data.kind}
+            data-audience={item.data.audience}
+          >
+            <div class="grid gap-5 md:grid-cols-[1fr_11rem] md:items-start md:gap-10">
+              <div class="space-y-3">
+                <div>
+                  <h2 class="font-serif text-[1.3rem] font-medium leading-snug text-ink">
+                    {item.data.title}
+                  </h2>
+                  <p class="mt-0.5 font-sans text-sm text-muted">{item.data.creator}</p>
+                </div>
+
+                <p class="max-w-[60ch] font-serif text-base leading-[1.72] text-ink/90">
+                  {item.data.note}
+                </p>
+
+                {item.data.quote && (
+                  <blockquote class="max-w-[58ch] rounded-[2px] bg-surface px-5 py-4 border-l-2 border-sea font-serif text-[0.98rem] italic leading-[1.68] text-ink/90">
+                    “{item.data.quote}”
+                  </blockquote>
+                )}
+              </div>
+
+              <div class="flex flex-wrap gap-x-4 gap-y-1 font-sans text-sm md:flex-col md:items-end md:gap-1">
+                <span class="text-ink">{item.data.kind}</span>
+                <span
+                  class:list={[
+                    item.data.audience !== 'Genel' ? 'text-botanical font-medium' : 'text-muted'
+                  ]}
+                >
+                  {item.data.audience === 'Öğrenci'
+                    ? 'Öğrenciler için'
+                    : item.data.audience === 'Veli'
+                      ? 'Veliler için'
+                      : 'Genel okuma'}
+                </span>
+                <span class="text-xs text-muted">{item.data.status}</span>
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  function bindShelfFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-shelf-filter]');
+    const list = document.getElementById('shelf-list');
+    if (!buttons.length || !list) return;
+
+    buttons.forEach((button) => {
+      if (button.dataset.bound === 'true') return;
+      button.dataset.bound = 'true';
+
+      button.addEventListener('click', () => {
+        const selected = button.dataset.shelfFilter ?? 'Tümü';
+        buttons.forEach((btn) => btn.setAttribute('aria-pressed', String(btn === button)));
+
+        list.querySelectorAll<HTMLElement>('article').forEach((article) => {
+          const kind = article.dataset.kind;
+          const audience = article.dataset.audience;
+          const match =
+            selected === 'Tümü' || kind === selected || audience === selected;
+          article.classList.toggle('hidden', !match);
+        });
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', bindShelfFilter);
+</script>

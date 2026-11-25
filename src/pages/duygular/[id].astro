@@ -1,0 +1,72 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BotanicalMark from '../../components/BotanicalMark.astro';
+import { formatTurkishDate, sortByPublishDateDesc } from '../../utils/format';
+
+export async function getStaticPaths() {
+  const entries = sortByPublishDateDesc(await getCollection('duygular'));
+  return entries.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { term, handwrittenLine, excerpt, publishDate, location, photo, photoAlt } = entry.data;
+---
+
+<BaseLayout
+  title={term}
+  description={excerpt}
+  ogImage={`/og/duygular/${entry.id}.png`}
+  ogType="article"
+  showReadingProgress={true}
+>
+  <article class="mx-auto max-w-5xl px-6 pt-6 sm:px-8 sm:pt-10">
+    <div class="max-w-[64ch]">
+      <a
+        href="/duygular"
+        class="font-sans text-sm text-muted no-underline hover:text-sea transition-colors"
+      >
+        Duygular sözlüğüne dön
+      </a>
+
+      <p class="mt-8 font-serif text-xl italic text-muted">“{handwrittenLine}”</p>
+
+      <h1 class="mt-2 font-serif text-3xl font-medium leading-[1.2] tracking-[-0.02em] text-ink sm:text-4xl">
+        {term}
+      </h1>
+
+      <div class="mt-4 flex flex-wrap gap-x-5 font-sans text-sm text-muted">
+        {location && <span>{location}</span>}
+        <time datetime={publishDate.toISOString()}>{formatTurkishDate(publishDate)}</time>
+      </div>
+    </div>
+
+    {
+      photo && (
+        <figure class="mt-9 max-w-2xl">
+          <div class="overflow-hidden rounded-[2px] bg-surface">
+            <img
+              src={photo}
+              alt={photoAlt ?? term}
+              class="aspect-[4/3] w-full object-cover"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+        </figure>
+      )
+    }
+
+    <div class="editorial-prose mt-10">
+      <Content />
+    </div>
+
+    <div class="mt-14 text-botanical/80">
+      <BotanicalMark class="h-8 w-8" />
+    </div>
+  </article>
+</BaseLayout>

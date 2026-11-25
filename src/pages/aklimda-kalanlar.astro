@@ -1,0 +1,209 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BotanicalMark from '../components/BotanicalMark.astro';
+
+const clippings = [
+  {
+    id: 'tteokbokki',
+    image: '/images/kupur-tteokbokki.jpg',
+    alt: 'Kurşun kalemle altı çizilmiş kitap sayfası: Konuşmadan önce anılarla utanç iç içe geçmişti',
+    book: 'Ölmek İstiyorum Ama Tteokbokki de Yemek İstiyorum',
+    author: 'Baek Sehee',
+    note: 'İçeride tutulduğunda dağ gibi görünen bir duygunun, dile döküldüğü an sadeleşip küçülmesini bundan daha net anlatan çok az satır var.'
+  },
+  {
+    id: 'kabuk',
+    image: '/images/kupur-kabuk.jpg',
+    alt: 'Kurşun kalemle altı çizilmiş kitap sayfası: İnsan kabuklu böcek gibi bir şey, defter kapanmayınca kapanmıyor',
+    book: 'Unutma Beni Apartmanı',
+    author: 'Nermin Yıldırım',
+    note: 'Kaçınmak kısa vadede korur ama yarım kalan defteri kapatmaz. Bazen önce kabuğa çekildiğimizi fark etmek bile onarımın başlangıcı.'
+  },
+  {
+    id: 'beklemek',
+    image: '/images/kupur-beklemek.jpg',
+    alt: 'Kırmızı kalemle altı çizilmiş kitap sayfası: Beklemek gün geçtikçe hayatın ta kendisi gibi gelmeye başladı',
+    book: 'Arkadaşlarla Sohbetler',
+    author: 'Sally Rooney',
+    note: 'Beklerken hayatı askıya almamak üzerine; dünya dönmeye devam ederken kendi gündelik ritmine sahip çıkmak.'
+  },
+  {
+    id: 'gercek',
+    image: '/images/kupur-gercek.jpg',
+    alt: 'Kurşun kalemle altı çizilmiş kitap sayfası: Öğrendiğim şey gerçeğin ayarlanabilecek bir şey olduğuydu',
+    book: 'Okuma defterinden',
+    author: 'Altı çizili pasaj',
+    note: 'Kendi duygusunu bastırıp sadece "uygun" olanı yapmaya alışan insanın iç sesi. Psikolojik esneklik tam da bu otomatik uyumun fark edilmesiyle başlıyor.'
+  },
+  {
+    id: 'veda',
+    image: '/images/kupur-veda.jpg',
+    alt: 'Kurşun kalemle altı çizilmiş kitap sayfası: Veda etmek de öyle, ede ede öğreniyorsun',
+    book: 'Okuma defterinden',
+    author: 'Altı çizili pasaj',
+    note: 'Sağlıklı sınır koymak bazen kalpsizleşmek değil; ömrünü tamamlamış bir yükü şükranla bırakıp kendi yoluna devam edebilmektir.'
+  }
+];
+
+const yearHighlights = [
+  'Han Kang — Veda Etmiyorum, Çocuk Geliyor, Beyaz Kitap',
+  'Nermin Yıldırım — Ev, Unutma Beni Apartmanı, Saklı Bahçeler Haritası',
+  'Vigdis Hjorth — Miras, Annem Öldü Mü',
+  'Tarık Tufan — Gece Açan Çiçekler',
+  'Yu Hua — Yaşamak',
+  'Sally Rooney — Arkadaşlarla Sohbetler'
+];
+---
+
+<BaseLayout
+  title="Aklımda kalanlar"
+  description="Kurşun kalemle altı çizilen kitap sayfaları, okuma kulesi ve geride kalan cümleler."
+  ogImage="/og/aklimda-kalanlar.png"
+>
+  <div class="mx-auto max-w-5xl px-6 pt-6 sm:px-8 sm:pt-10">
+    <!-- Giriş + Gerçek Kitap Kulesi -->
+    <section class="grid gap-10 pb-20 lg:grid-cols-[1.15fr_0.85fr] lg:items-start lg:gap-14">
+      <div class="space-y-6">
+        <h1 class="font-serif text-3xl font-medium tracking-[-0.02em] text-ink sm:text-4xl">
+          Aklımda kalanlar
+        </h1>
+        <p class="max-w-[52ch] font-serif text-[1.1rem] leading-[1.78] text-muted">
+          Bir yılı bitirirken geriye çoğu zaman takvimdeki tarihler değil; kurşun kalemle altını
+          çizdiğim satırlar ve masanın kenarında üst üste biriken kitaplar kalıyor.
+        </p>
+
+        <div class="pt-4 space-y-3">
+          <h2 class="font-serif text-lg font-medium text-ink">2025–2026 kulesinden öne çıkanlar</h2>
+          <ul class="space-y-2 font-serif text-[0.98rem] leading-relaxed text-muted">
+            {yearHighlights.map((item) => <li>{item}</li>)}
+          </ul>
+          <div class="pt-2">
+            <a href="/kitaplik" class="text-link">Tüm kitaplık notlarını gör</a>
+          </div>
+        </div>
+      </div>
+
+      <figure>
+        <div class="overflow-hidden rounded-[2px] bg-surface">
+          <img
+            src="/images/kitap-kulesi.jpg"
+            alt="Masada üst üste dizilmiş 2025-2026 okuma kulesi kitapları"
+            width="995"
+            height="1332"
+            class="w-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+        <figcaption class="mt-3 font-sans text-xs text-muted">
+          Yıl boyunca okunanlar, masanın bir köşesinde
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- Altı çizili sayfa kupürleri -->
+    <section aria-labelledby="kupurler-baslik" class="space-y-14">
+      <div class="max-w-[58ch] space-y-2">
+        <h2
+          id="kupurler-baslik"
+          class="font-serif text-2xl font-medium tracking-[-0.015em] text-ink"
+        >
+          Altı çizili sayfalar
+        </h2>
+        <p class="font-sans text-sm text-muted">
+          Yakından okumak için herhangi bir sayfanın üzerine tıklayabilirsin.
+        </p>
+      </div>
+
+      <div class="space-y-16">
+        {
+          clippings.map((clip) => (
+            <article class="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-center md:gap-10">
+              <button
+                type="button"
+                class="group block w-full overflow-hidden rounded-[2px] bg-surface text-left cursor-zoom-in"
+                data-lightbox-src={clip.image}
+                data-lightbox-alt={clip.alt}
+                data-lightbox-caption={`${clip.book} — ${clip.author}`}
+                aria-label={`${clip.book} sayfasını büyüt`}
+              >
+                <img
+                  src={clip.image}
+                  alt={clip.alt}
+                  class="w-full object-cover transition-opacity duration-200 group-hover:opacity-95"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </button>
+
+              <div class="space-y-3">
+                <div>
+                  <h3 class="font-serif text-xl font-medium leading-snug text-ink">{clip.book}</h3>
+                  <p class="mt-0.5 font-sans text-sm text-muted">{clip.author}</p>
+                </div>
+                <p class="font-serif text-base leading-[1.75] text-muted">{clip.note}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <div class="mt-16 text-botanical/80">
+      <BotanicalMark class="h-8 w-8" />
+    </div>
+  </div>
+
+  <!-- Sade sayfa büyütme penceresi -->
+  <dialog
+    id="clipping-lightbox"
+    class="m-auto max-h-[92dvh] max-w-4xl rounded-[3px] bg-canvas p-4 text-ink backdrop:bg-ink/75 sm:p-6"
+  >
+    <div class="flex items-center justify-between gap-4 pb-3">
+      <p id="lightbox-caption" class="font-sans text-sm text-muted"></p>
+      <button
+        id="lightbox-close"
+        type="button"
+        class="font-sans text-sm font-medium text-sea hover:underline cursor-pointer"
+      >
+        Kapat
+      </button>
+    </div>
+    <img id="lightbox-img" src="" alt="" class="max-h-[78dvh] w-full object-contain rounded-[2px]" />
+  </dialog>
+</BaseLayout>
+
+<script>
+  function bindClippingLightbox() {
+    const dialog = document.getElementById('clipping-lightbox') as HTMLDialogElement | null;
+    const img = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const caption = document.getElementById('lightbox-caption');
+    const closeBtn = document.getElementById('lightbox-close');
+    if (!dialog || !img || !caption) return;
+
+    document.querySelectorAll<HTMLButtonElement>('[data-lightbox-src]').forEach((btn) => {
+      if (btn.dataset.bound === 'true') return;
+      btn.dataset.bound = 'true';
+      btn.addEventListener('click', () => {
+        img.src = btn.dataset.lightboxSrc ?? '';
+        img.alt = btn.dataset.lightboxAlt ?? '';
+        caption.textContent = btn.dataset.lightboxCaption ?? '';
+        dialog.showModal();
+      });
+    });
+
+    if (closeBtn && closeBtn.dataset.bound !== 'true') {
+      closeBtn.dataset.bound = 'true';
+      closeBtn.addEventListener('click', () => dialog.close());
+    }
+
+    if (dialog.dataset.bound !== 'true') {
+      dialog.dataset.bound = 'true';
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+    }
+  }
+
+  document.addEventListener('astro:page-load', bindClippingLightbox);
+</script>

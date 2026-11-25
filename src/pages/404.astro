@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Sayfa bulunamadı" description="Aradığın sayfa burada değil.">
+  <div class="mx-auto max-w-5xl px-6 pt-12 sm:px-8 sm:pt-20">
+    <div class="max-w-[54ch] space-y-5">
+      <h1 class="font-serif text-3xl font-medium tracking-[-0.02em] text-ink sm:text-4xl">
+        Bu sayfa bulunamadı
+      </h1>
+      <p class="font-serif text-lg leading-[1.75] text-muted">
+        Bağlantı taşınmış ya da eksik yazılmış olabilir. Anasayfadan devam edebilir veya doğrudan
+        yazılar arşivine geçebilirsin.
+      </p>
+      <div class="flex flex-wrap items-center gap-6 pt-2">
+        <a href="/" class="primary-action">Anasayfaya dön</a>
+        <a href="/yazilar" class="text-link">Yazıları aç</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
