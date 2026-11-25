@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://tugbadan.example',
+  site: 'https://tugba.yusufd-polar.workers.dev',
   integrations: [mdx(), sitemap()],
   vite: {
     plugins: [tailwindcss()]

@@ -10,7 +10,7 @@ export async function GET(context: APIContext) {
   return rss({
     title: siteConfig.title,
     description: siteConfig.description,
-    site: context.site ?? 'https://tugbadan.example',
+    site: context.site ?? 'https://tugba.yusufd-polar.workers.dev',
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.excerpt,
